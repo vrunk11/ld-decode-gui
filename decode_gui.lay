@@ -1,0 +1,14 @@
+LAYOUT(decode, 400, 200)
+	ITEM(Upp::Button, btn_output_folder, SetLabel(t_("Destination")).LeftPosZ(308, 80).TopPosZ(84, 20))
+	ITEM(Upp::EditString, text_output_folder, LeftPosZ(20, 276).TopPosZ(84, 19))
+	ITEM(Upp::Button, btn_input_file, SetLabel(t_("Input file")).LeftPosZ(308, 80).VSizePosZ(40, 140))
+	ITEM(Upp::EditString, text_input_file, LeftPosZ(20, 276).VSizePosZ(40, 141))
+	ITEM(Upp::DropList, standard_list, LeftPosZ(20, 64).TopPosZ(124, 19))
+	ITEM(Upp::EditInt, numeric_start, Min(0).Max(110000).LeftPosZ(184, 64).TopPosZ(124, 19))
+	ITEM(Upp::EditInt, numeric_length, Min(1).Max(110000).LeftPosZ(184, 64).TopPosZ(156, 19))
+	ITEM(Upp::Label, dv___7, SetLabel(t_("Start")).LeftPosZ(132, 40).TopPosZ(124, 19))
+	ITEM(Upp::Label, dv___8, SetLabel(t_("Length")).LeftPosZ(132, 40).TopPosZ(156, 19))
+	ITEM(Upp::Button, btn_decode, SetLabel(t_("DECODE")).SetFont(Upp::StdFontZ(20)).LeftPosZ(272, 100).TopPosZ(120, 64))
+	ITEM(Upp::Option, option_dotPy, SetLabel(t_("ld-decode \".py\"")).LeftPosZ(276, 96).TopPosZ(184, 16))
+END_LAYOUT
+

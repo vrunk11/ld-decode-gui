@@ -1,0 +1,10 @@
+uses
+	CtrlLib;
+
+file
+	decode_gui.lay,
+	main.cpp;
+
+mainconfig
+	"" = "GUI";
+
