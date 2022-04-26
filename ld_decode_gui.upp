@@ -4,6 +4,7 @@ uses
 file
 	decode_gui.lay,
 	ld_decode_utils.h,
+	icon.iml,
 	main.cpp;
 
 mainconfig
