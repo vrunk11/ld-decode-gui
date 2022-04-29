@@ -9,6 +9,14 @@
 
 #include "ld_decode_utils.h"
 
+#ifdef _WIN64
+	#define PAUSE "pause"
+#elif __linux
+	#define PAUSE "read -n1"
+#elif __APPLE__
+	#define PAUSE "read -n1"
+#endif
+
 using namespace Upp;
 
 Thread thread1;
@@ -88,11 +96,28 @@ struct MyAppWindow : public Withdecode<TopWindow> {
         cfg.Get("default_enable_analog_audio") == "1" ? option_analog_audio.Set(1) : option_analog_audio.Set(0);
         
         // Start-seek option list
-        option_start_list.Add("start");
-        option_start_list.Add("seek");
+        option_start_list.Add("Start");
+        option_start_list.Add("Seek");
         option_start_list.SetIndex(0);
         
-        cfg.Get("default_enable_length") == "1" ? option_length.Set(1) : option_length.Set(0) ;
+        //length
+        option_length.Add("Length");
+        option_length.Add("Ending");
+        option_length.SetIndex(0);
+        
+        if(ToUpper(cfg.Get("default_start")) == "START"){
+        	option_start_list.SetIndex(0);
+        }
+        else if(ToUpper(cfg.Get("default_start")) == "SEEK"){
+        	option_start_list.SetIndex(1);
+        }
+        
+        if(ToUpper(cfg.Get("default_length")) == "LENGTH"){
+        	option_length.SetIndex(0);
+        }
+        else if(ToUpper(cfg.Get("default_length")) == "ENDING"){
+        	option_length.SetIndex(1);
+        }
         
         btn_input_file << [=] {
         	FileSel file;
@@ -133,13 +158,13 @@ struct MyAppWindow : public Withdecode<TopWindow> {
                if(check_file_extention(cfg.Get("input_format"),GetFileExt(text_input_file.GetText().ToString())))
                {
 	               if(DirectoryExists(text_output_folder.GetText().ToString()) && text_output_folder.GetText().ToString() != "")
-	               {
+	               {                   
 			           //declaration
-			           String command;
-			           String opt_start;
-			           String opt_length;
-			           String opt_efm;
-			           String opt_analog_audio;
+			           String command = "";
+			           String opt_start = "";
+			           String opt_length = "";
+			           String opt_efm = "";
+			           String opt_analog_audio = "";
 			           
 			           String path_ld_analyse = cfg.Get("path_ld_analyse");
 			           String file_name = text_input_file.GetText().ToString();
@@ -147,15 +172,19 @@ struct MyAppWindow : public Withdecode<TopWindow> {
 			           
 			           //assign
 			           FileExists("ld-decode.py") ? (command = "ld-decode.py --") : (command = "ld-decode --");
-			           numeric_start.GetText().ToString() != "" ? (option_start_list.GetValue() == "start" ? opt_start = " -s " + numeric_start.GetText().ToString() + " " : opt_start = " -S " + numeric_start.GetText().ToString() + " ") : opt_start = "";
-			           option_length.Get() && numeric_length.GetText().ToString() != "" ? opt_length = " -l " + numeric_length.GetText().ToString() + " " : " ";
+			           
+			           if(box_option_start.Get())
+			           {
+			                numeric_start.GetText().ToString() != "" ? (option_start_list.GetValue() == "Start" ? opt_start = " -s " + numeric_start.GetText().ToString() + " " : opt_start = " -S " + numeric_start.GetText().ToString() + " ") : opt_start = "";
+			            	numeric_length.GetText().ToString() != "" ? (option_length.GetValue() == "Length" ? opt_length = " -l " + numeric_length.GetText().ToString() + " " : (numeric_start.GetText().ToString() != "" ? opt_length = " -l " + find_ending_timecode(numeric_start.GetData(),numeric_length.GetData()) + " " :  opt_length = " -l " + numeric_length.GetText().ToString() + " ")) : " ";
+			           }
 			           !option_efm.Get() ? opt_efm = " --noEFM " : opt_efm = "";
 			           !option_analog_audio.Get() ? opt_analog_audio = " --disable_analog_audio " : opt_analog_audio = "";
 			           
 			           //composition command   
-			           command += standard_list.GetValue().ToString() + opt_efm + opt_analog_audio + opt_start + opt_length + file_name + " " + text_output_folder.GetText().ToString();
-			           system("echo \"" + command + "\" & pause" );
-			           command = "echo \"" + command + "\" & " + command + " & pause" ;
+			           command += standard_list.GetValue().ToString() + " " + opt_efm + opt_analog_audio + opt_start + opt_length + file_name + " " + text_output_folder.GetText().ToString();
+			           system("echo \"" + command + "\" & " + PAUSE);
+			           command = "echo \"" + command + "\" & " + command + " & " + PAUSE ;
 			           
 			           if(cfg.Get("launch_ld_analyse") == "1")
 			           {
